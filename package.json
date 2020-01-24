@@ -1,0 +1,22 @@
+{
+  "name": "wwibs",
+  "version": "0.0.0",
+  "description": "A performance-focused Web Worker Interfacing & Broadcasting System",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Pageworks/wwibs.git"
+  },
+  "keywords": [
+    "web-worker",
+    "actor-model",
+    "messaging",
+    "state-management"
+  ],
+  "author": "Pageworks",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/Pageworks/wwibs/issues"
+  },
+  "homepage": "https://github.com/Pageworks/wwibs#readme"
+}
