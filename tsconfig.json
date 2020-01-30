@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "allowJs": true,
+        "checkJs": false,
+        "target": "ES2019",
+        "module": "ESNext",
+        "outDir": "./",
+        "declaration": true,
+        "moduleResolution": "Node"
+    },
+    "include": ["src"],
+    "exclude": ["node_modules"]
+}
