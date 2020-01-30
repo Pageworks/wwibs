@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.0.0] - 2020-01-19
+## [0.0.1] - 2020-01-19
 
 ### Added
 
@@ -18,5 +18,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 -   prerelease script to prepare broadcaster worker script for CDN
 -   broadcaster export declarations
 
-[unreleased]: https://github.com/codewithkyle/broadcom/compare/v0.0.0...HEAD
-[0.0.0]: https://github.com/codewithkyle/broadcom/releases/tag/v0.0.0
+[unreleased]: https://github.com/codewithkyle/broadcom/compare/v0.0.1...HEAD
+[0.0.1]: https://github.com/codewithkyle/broadcom/releases/tag/v0.0.1
