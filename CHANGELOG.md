@@ -18,5 +18,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 -   prerelease script to prepare broadcaster worker script for CDN
 -   broadcaster export declarations
 
-[unreleased]: https://github.com/codewithkyle/broadcom/compare/v0.0.1...HEAD
-[0.0.1]: https://github.com/codewithkyle/broadcom/releases/tag/v0.0.1
+[unreleased]: https://github.com/Pageworks/wwibs/compare/v0.0.1...HEAD
+[0.0.1]: https://github.com/Pageworks/wwibs/releases/tag/v0.0.1

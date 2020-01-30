@@ -1,12 +1,12 @@
 {
     "name": "wwibs",
-    "version": "0.0.0",
+    "version": "0.0.1",
     "description": "A performance-focused Web Worker Interfacing & Broadcasting System",
     "main": "index.js",
     "files": [
         "lib",
-        "broadcom.js",
-        "broadcom.d.ts",
+        "wwibs.js",
+        "wwibs.d.ts",
         "broadcaster-worker.min.js"
     ],
     "repository": {
