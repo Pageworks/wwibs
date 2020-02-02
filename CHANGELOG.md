@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.5] - 2020-02-02
+
+### Fixed
+
+-   `globalManager` is no longer being overridden every time the script is imported
+
 ## [0.0.4] - 2020-02-02
 
 ### Added
@@ -24,6 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 -   prerelease script to prepare broadcaster worker script for CDN
 -   broadcaster export declarations
 
-[unreleased]: https://github.com/Pageworks/wwibs/compare/v0.0.4...HEAD
-[0.0.4]: https://github.com/Pageworks/wwibs/releases/tag/v0.0.4
+[unreleased]: https://github.com/Pageworks/wwibs/compare/v0.0.5...HEAD
+[0.0.5]: https://github.com/Pageworks/wwibs/releases/tag/v0.0.5...v0.0.4
+[0.0.4]: https://github.com/Pageworks/wwibs/releases/tag/v0.0.4...v0.0.1
 [0.0.1]: https://github.com/Pageworks/wwibs/releases/tag/v0.0.1

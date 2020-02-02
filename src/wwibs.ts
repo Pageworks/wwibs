@@ -6,10 +6,9 @@ if (!script) {
     script.id = "broadcaster";
     script.innerHTML = "window.globalManager = null;window.globalMessage = null;window.globalHookup = null;window.globalDisconnect = null;";
     document.head.appendChild(script);
+    // @ts-ignore
+    globalManager = new Broadcaster();
 }
-
-// @ts-ignore
-globalManager = new Broadcaster();
 
 // @ts-ignore
 globalMessage = globalManager.message.bind(globalManager);
