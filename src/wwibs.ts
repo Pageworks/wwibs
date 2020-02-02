@@ -4,12 +4,12 @@ let script = document.head.querySelector("script#broadcaster") || null;
 if (!script) {
     script = document.createElement("script");
     script.id = "broadcaster";
-    script.innerHTML = "window.globalManager;window.globalMessage;window.globalHookup;window.globalDisconnect;";
+    script.innerHTML = "window.globalManager = null;window.globalMessage = null;window.globalHookup = null;window.globalDisconnect = null;";
     document.head.appendChild(script);
 }
 
 // @ts-ignore
-globalManage = new Broadcaster();
+globalManager = new Broadcaster();
 
 // @ts-ignore
 globalMessage = globalManager.message.bind(globalManager);
