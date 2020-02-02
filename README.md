@@ -9,4 +9,4 @@ A performance-focused Actor Model implementation for the web.
 -   Record message history in IDB
 -   Implement `reply` and `reply-all` protocols via IDB lookup
 -   Implement the ability to expose & link Web Worker functions
--   Implement ability to send message in/out of IIFEs
+-   ✅ Implement ability to send message in/out of IIFEs
