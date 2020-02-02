@@ -1,6 +1,18 @@
 import Broadcaster from "./lib/broadcaster";
 
-const BroadcastManager = new Broadcaster();
+let script = document.head.querySelector("script#broadcaster") || null;
+if (!script) {
+    script = document.createElement("script");
+    script.id = "broadcaster";
+    script.innerHTML = "window.globalManager;window.globalMessage;window.globalHookup;window.globalDisconnect;";
+    document.head.appendChild(script);
+}
+
+// @ts-ignore
+globalManage = new Broadcaster();
+
+// @ts-ignore
+globalMessage = globalManager.message.bind(globalManager);
 
 /**
  * Sends a message to an inbox.
@@ -8,7 +20,11 @@ const BroadcastManager = new Broadcaster();
  * @param data - the `MessageData` object that will be sent to the inboxes
  * @param maxAttempts - the maximum number of attempts before the message is dropped, can be set to `Infinity`
  */
-export const message: (recipient: string, data: { type: string; [key: string]: any }, maxAttempts?: number) => void = BroadcastManager.message.bind(BroadcastManager);
+// @ts-ignore
+export const message: (recipient: string, data: { type: string; [key: string]: any }, maxAttempts?: number) => void = globalMessage;
+
+// @ts-ignore
+globalHookup = globalManager.hookup.bind(globalManager);
 
 /**
  * Register and hookup an inbox.
@@ -16,10 +32,15 @@ export const message: (recipient: string, data: { type: string; [key: string]: a
  * @param inbox - the function that will handle the inboxes incoming messages
  * @returns inbox UID
  */
-export const hookup: (name: string, inbox: Function) => string = BroadcastManager.hookup.bind(BroadcastManager);
+// @ts-ignore
+export const hookup: (name: string, inbox: Function) => string = globalHookup;
+
+// @ts-ignore
+globalDisconnect = globalManager.disconnect.bind(globalManager);
 
 /**
  * Disconnect an inbox.
  * @param inboxId - the UID of the inbox
  */
-export const disconnect: (inboxId: string) => void = BroadcastManager.disconnect.bind(BroadcastManager);
+// @ts-ignore
+export const disconnect: (inboxId: string) => void = globalDisconnect;
