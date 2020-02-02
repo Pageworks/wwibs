@@ -24,5 +24,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 -   prerelease script to prepare broadcaster worker script for CDN
 -   broadcaster export declarations
 
-[unreleased]: https://github.com/Pageworks/wwibs/compare/v0.0.1...HEAD
+[unreleased]: https://github.com/Pageworks/wwibs/compare/v0.0.4...HEAD
+[0.0.4]: https://github.com/Pageworks/wwibs/releases/tag/v0.0.4
 [0.0.1]: https://github.com/Pageworks/wwibs/releases/tag/v0.0.1
