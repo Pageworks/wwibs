@@ -6,7 +6,7 @@ type InboxData = {
 
 class BroadcastHelper {
     private queuedMessages: Array<BroadcastWorkerMessage>;
-    private queueTimer: WindowTimers;
+    private queueTimer: any;
     private queueTimeout = 1000; // Milliseconds
     private inboxes: Array<InboxData>;
 
@@ -20,7 +20,7 @@ class BroadcastHelper {
         self.postMessage({
             recipient: "broadcaster",
             data: {
-                type: "ready",
+                type: "inbox-worker-ready",
             },
         });
     }

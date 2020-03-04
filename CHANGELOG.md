@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+-   History Worker web worker
+
+### Changed
+
+-   `worker` variable has been renamed to `inboxWorker` in `Broadcaster`
+-   `broadcast-worker.ts` renamed to `inbox-worker.ts`
+
+### Updated
+
+-   npm packages
+
 ## [0.0.5] - 2020-02-02
 
 ### Fixed

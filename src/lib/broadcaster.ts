@@ -9,41 +9,69 @@ type Inbox = {
 const VERSION = "REPLACE_WITH_VERISON";
 
 export default class Broadcaster {
-    private worker: Worker;
+    private inboxWorker: Worker;
+    private historyWorker: Worker;
     private inboxes: Array<Inbox>;
     private messageQueue: Array<BroadcastWorkerMessage>;
     private state: {
         allowMessaging: boolean;
+        historyWorkerReady: boolean;
+        inboxWorkerReady: boolean;
     };
 
     constructor() {
-        this.worker;
-        this.setupWorker();
+        this.inboxWorker;
+        this.historyWorker;
+        this.setupBroadcastWorker();
+        this.setupHistoryWorker();
         this.inboxes = [];
         this.messageQueue = [];
         this.state = {
             allowMessaging: false,
+            historyWorkerReady: false,
+            inboxWorkerReady: false,
         };
     }
 
-    private async setupWorker() {
-        let request = await fetch(`https://cdn.jsdelivr.net/npm/wwibs@${VERSION}/broadcaster-worker.min.js`);
+    private async setupHistoryWorker() {
+        let request = await fetch(`https://cdn.jsdelivr.net/npm/wwibs@${VERSION}/history-worker.min.js`);
         let url;
         if (request.ok) {
             const response = await request.blob();
             url = URL.createObjectURL(response);
         } else {
-            request = await fetch("/broadcaster-worker.min.js");
+            request = await fetch("/history-worker.min.js");
             if (request.ok) {
                 const response = await request.blob();
                 url = URL.createObjectURL(response);
             } else {
-                console.error(`Failed to fetch worker script from CDN and ${location.origin}. `);
+                console.error(`Failed to fetch the History Worker from the CDN and ${location.origin}.`);
             }
         }
         if (url) {
-            this.worker = new Worker(url);
-            this.worker.onmessage = this.handleMessage.bind(this);
+            this.historyWorker = new Worker(url);
+            this.historyWorker.onmessage = this.handleHistoryWorkerMessage.bind(this);
+        }
+    }
+
+    private async setupBroadcastWorker() {
+        let request = await fetch(`https://cdn.jsdelivr.net/npm/wwibs@${VERSION}/inbox-worker.min.js`);
+        let url;
+        if (request.ok) {
+            const response = await request.blob();
+            url = URL.createObjectURL(response);
+        } else {
+            request = await fetch("/inbox-worker.min.js");
+            if (request.ok) {
+                const response = await request.blob();
+                url = URL.createObjectURL(response);
+            } else {
+                console.error(`Failed to fetch the Inbox Worker from the CDN and ${location.origin}.`);
+            }
+        }
+        if (url) {
+            this.inboxWorker = new Worker(url);
+            this.inboxWorker.onmessage = this.handleInboxWorkerMessage.bind(this);
         }
     }
 
@@ -54,7 +82,8 @@ export default class Broadcaster {
         this.state.allowMessaging = true;
         if (this.messageQueue.length) {
             for (let i = 0; i < this.messageQueue.length; i++) {
-                this.worker.postMessage(this.messageQueue[i]);
+                this.inboxWorker.postMessage(this.messageQueue[i]);
+                this.historyWorker.postMessage(this.messageQueue[i]);
             }
         }
         this.messageQueue = [];
@@ -71,16 +100,25 @@ export default class Broadcaster {
     }
 
     /**
-     * Broadcaster received a message from another thread.
+     * Broadcaster received a message from the Inbox worker.
      * This method is an alias of `this.worker.onmessage`
      */
-    private handleMessage(e: MessageEvent): void {
+    private handleInboxWorkerMessage(e: MessageEvent): void {
         const data = e.data;
         if (data.recipient?.trim().toLowerCase() === "broadcaster") {
             this.inbox(data.data);
         } else {
             this.sendDataToInboxes(data.inboxIndexes, data.data);
         }
+    }
+
+    /**
+     * Broadcaster received a message from the History worker.
+     * This method is an alias of `this.worker.onmessage`
+     */
+    private handleHistoryWorkerMessage(e: MessageEvent): void {
+        const data = e.data;
+        this.inbox(data);
     }
 
     private sendUserDeviceInformation(): void {
@@ -106,9 +144,13 @@ export default class Broadcaster {
     private inbox(data: MessageData): void {
         const { type } = data;
         switch (type) {
-            case "ready":
-                this.flushMessageQueue();
-                this.sendUserDeviceInformation();
+            case "inbox-worker-ready":
+                this.state.inboxWorkerReady = true;
+                this.checkWorkerStatuses();
+                break;
+            case "history-worker-ready":
+                this.state.historyWorkerReady = true;
+                this.checkWorkerStatuses();
                 break;
             case "cleanup":
                 this.cleanup();
@@ -118,6 +160,13 @@ export default class Broadcaster {
             default:
                 console.warn(`Unknown broadcaster message type: ${data.type}`);
                 break;
+        }
+    }
+
+    private checkWorkerStatuses() {
+        if (this.state.historyWorkerReady && this.state.inboxWorkerReady) {
+            this.flushMessageQueue();
+            this.sendUserDeviceInformation();
         }
     }
 
@@ -176,7 +225,7 @@ export default class Broadcaster {
      */
     private postMessageToWorker(message: BroadcastWorkerMessage): void {
         if (this.state.allowMessaging) {
-            this.worker.postMessage(message);
+            this.inboxWorker.postMessage(message);
         } else {
             this.messageQueue.push(message);
         }
@@ -207,7 +256,7 @@ export default class Broadcaster {
                 addresses: updatedAddresses,
             },
         };
-        this.worker.postMessage(workerMessage);
+        this.inboxWorker.postMessage(workerMessage);
     }
 
     /**

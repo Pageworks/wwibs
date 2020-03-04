@@ -23,10 +23,10 @@ function setVersion() {
     });
 }
 
-function minify() {
+function minify(inputPath, outputPath) {
     return new Promise((resolve, reject) => {
-        const file = path.resolve(cwd, "lib/broadcaster-worker.js");
-        const output = path.join(cwd, "broadcaster-worker.min.js");
+        const file = path.resolve(cwd, inputPath);
+        const output = path.join(cwd, outputPath);
         fs.readFile(file, (error, buffer) => {
             if (error) {
                 reject(error);
@@ -57,7 +57,8 @@ function minify() {
 
 async function run() {
     try {
-        await minify();
+        await minify("lib/inbox-worker.js", "inbox-worker.min.js");
+        await minify("lib/history-worker.js", "history-worker.min.js");
         await setVersion();
     } catch (error) {
         console.log(error);
