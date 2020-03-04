@@ -31,6 +31,10 @@ export default class Broadcaster {
             historyWorkerReady: false,
             inboxWorkerReady: false,
         };
+
+        window.addEventListener("unload", () => {
+            this.historyWorker.postMessage({ type: "unload" });
+        });
     }
 
     private async setupHistoryWorker() {
