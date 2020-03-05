@@ -55,16 +55,45 @@ class HistoryWorker {
     private inbox(e: MessageEvent) {
         const data = e.data;
 
+        /** Handle window unload event */
         if (e.data?.type === "unload" && this.db) {
             indexedDB.deleteDatabase(`${dbUid}`);
             return;
         }
 
-        if (data?.recipient) {
-            switch (data.recipient) {
-                default:
-                    break;
-            }
+        /** If we have a DB and a message was posted log it in the History table */
+        if (data?.recipient && this.db) {
+            this.makeHistory(data.recipient, data.data, data.messageId);
+            return;
+        }
+
+        /** Log the message for future reply requests */
+        if (data?.senderID || data?.recipientIDs) {
+            // TODO: store data in DB or array
+            return;
         }
     }
+
+    /**
+     * Creates a transaction with indexedDB to store the message within the History table.
+     */
+    private makeHistory(recipient: string, data: MessageData, messageId: string): void {
+        new Promise((resolve, reject) => {
+            const transaction = this.db.transaction("history", "readwrite");
+            const store = transaction.objectStore("history");
+            const transactionData = {
+                messageUid: messageId,
+                recipient: recipient,
+                data: data,
+            };
+            store.add(transactionData);
+            transaction.oncomplete = resolve;
+            transaction.onerror = reject;
+        })
+            .then(() => {})
+            .catch(error => {
+                console.error(`Failed to write to the History table:`, error);
+            });
+    }
 }
+new HistoryWorker();

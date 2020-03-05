@@ -121,7 +121,7 @@ export default class Broadcaster {
      * This method is an alias of `this.worker.onmessage`
      */
     private handleHistoryWorkerMessage(e: MessageEvent): void {
-        const data = e.data;
+        const data = e.data.data;
         this.inbox(data);
     }
 
@@ -155,6 +155,10 @@ export default class Broadcaster {
             case "history-worker-ready":
                 this.state.historyWorkerReady = true;
                 this.checkWorkerStatuses();
+                break;
+            case "inbox-cleanup-complete":
+                this.state.allowMessaging = true;
+                this.flushMessageQueue();
                 break;
             case "cleanup":
                 this.cleanup();
@@ -230,6 +234,7 @@ export default class Broadcaster {
     private postMessageToWorker(message: BroadcastWorkerMessage): void {
         if (this.state.allowMessaging) {
             this.inboxWorker.postMessage(message);
+            this.historyWorker.postMessage(message);
         } else {
             this.messageQueue.push(message);
         }

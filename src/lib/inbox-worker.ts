@@ -63,7 +63,7 @@ class BroadcastHelper {
         self.postMessage({
             recipient: "broadcaster",
             data: {
-                type: "ready",
+                type: "inbox-cleanup-complete",
             },
         });
     }
