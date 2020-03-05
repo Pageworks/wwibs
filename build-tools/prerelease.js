@@ -57,8 +57,7 @@ function minify(inputPath, outputPath) {
 
 async function run() {
     try {
-        await minify("lib/inbox-worker.js", "inbox-worker.min.js");
-        await minify("lib/history-worker.js", "history-worker.min.js");
+        await minify("lib/wwibs-worker.js", "wwibs-worker.min.js");
         await setVersion();
     } catch (error) {
         console.log(error);

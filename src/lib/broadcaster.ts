@@ -9,63 +9,41 @@ type Inbox = {
 const VERSION = "REPLACE_WITH_VERISON";
 
 export default class Broadcaster {
-    private inboxWorker: Worker;
-    private historyWorker: Worker;
+    private worker: Worker;
     private inboxes: Array<Inbox>;
     private messageQueue: Array<BroadcastWorkerMessage>;
     private state: {
         allowMessaging: boolean;
-        historyWorkerReady: boolean;
-        inboxWorkerReady: boolean;
     };
 
     constructor() {
-        this.inboxWorker;
-        this.historyWorker;
+        this.worker;
         this.setupBroadcastWorker();
-        this.setupHistoryWorker();
         this.inboxes = [];
         this.messageQueue = [];
         this.state = {
             allowMessaging: false,
-            historyWorkerReady: false,
-            inboxWorkerReady: false,
         };
 
         window.addEventListener("unload", () => {
-            this.historyWorker.postMessage({ type: "unload" });
+            const workerMessage = {
+                recipient: "broadcast-worker",
+                data: {
+                    type: "unload",
+                },
+            };
+            this.worker.postMessage(workerMessage);
         });
     }
 
-    private async setupHistoryWorker() {
-        let request = await fetch(`https://cdn.jsdelivr.net/npm/wwibs@${VERSION}/history-worker.min.js`);
-        let url;
-        if (request.ok) {
-            const response = await request.blob();
-            url = URL.createObjectURL(response);
-        } else {
-            request = await fetch("/history-worker.min.js");
-            if (request.ok) {
-                const response = await request.blob();
-                url = URL.createObjectURL(response);
-            } else {
-                console.error(`Failed to fetch the History Worker from the CDN and ${location.origin}.`);
-            }
-        }
-        if (url) {
-            this.historyWorker = new Worker(url);
-            this.historyWorker.onmessage = this.handleHistoryWorkerMessage.bind(this);
-        }
-    }
-
     private async setupBroadcastWorker() {
-        let request = await fetch(`https://cdn.jsdelivr.net/npm/wwibs@${VERSION}/inbox-worker.min.js`);
+        let request = await fetch(`https://cdn.jsdelivr.net/npm/wwibs@${VERSION}/wwibs-worker.min.js`);
         let url;
         if (request.ok) {
             const response = await request.blob();
             url = URL.createObjectURL(response);
         } else {
-            request = await fetch("/inbox-worker.min.js");
+            request = await fetch("/wwibs-worker.min.js");
             if (request.ok) {
                 const response = await request.blob();
                 url = URL.createObjectURL(response);
@@ -74,8 +52,8 @@ export default class Broadcaster {
             }
         }
         if (url) {
-            this.inboxWorker = new Worker(url);
-            this.inboxWorker.onmessage = this.handleInboxWorkerMessage.bind(this);
+            this.worker = new Worker(url);
+            this.worker.onmessage = this.handleWorkerMessage.bind(this);
         }
     }
 
@@ -86,8 +64,7 @@ export default class Broadcaster {
         this.state.allowMessaging = true;
         if (this.messageQueue.length) {
             for (let i = 0; i < this.messageQueue.length; i++) {
-                this.inboxWorker.postMessage(this.messageQueue[i]);
-                this.historyWorker.postMessage(this.messageQueue[i]);
+                this.worker.postMessage(this.messageQueue[i]);
             }
         }
         this.messageQueue = [];
@@ -107,7 +84,7 @@ export default class Broadcaster {
      * Broadcaster received a message from the Inbox worker.
      * This method is an alias of `this.worker.onmessage`
      */
-    private handleInboxWorkerMessage(e: MessageEvent): void {
+    private handleWorkerMessage(e: MessageEvent): void {
         const data = e.data;
         if (data.recipient?.trim().toLowerCase() === "broadcaster") {
             this.inbox(data.data);
@@ -116,20 +93,12 @@ export default class Broadcaster {
         }
     }
 
-    /**
-     * Broadcaster received a message from the History worker.
-     * This method is an alias of `this.worker.onmessage`
-     */
-    private handleHistoryWorkerMessage(e: MessageEvent): void {
-        const data = e.data.data;
-        this.inbox(data);
-    }
-
     private sendUserDeviceInformation(): void {
         // @ts-ignore
         const deviceMemory = window.navigator?.deviceMemory ?? 8;
         const isSafari = navigator.userAgent.search("Safari") >= 0 && navigator.userAgent.search("Chrome") < 0;
         const workerMessage: BroadcastWorkerMessage = {
+            senderID: null,
             recipient: "broadcast-worker",
             messageId: null,
             maxAttempts: 1,
@@ -148,15 +117,11 @@ export default class Broadcaster {
     private inbox(data: MessageData): void {
         const { type } = data;
         switch (type) {
-            case "inbox-worker-ready":
-                this.state.inboxWorkerReady = true;
-                this.checkWorkerStatuses();
+            case "worker-ready":
+                this.flushMessageQueue();
+                this.sendUserDeviceInformation();
                 break;
-            case "history-worker-ready":
-                this.state.historyWorkerReady = true;
-                this.checkWorkerStatuses();
-                break;
-            case "inbox-cleanup-complete":
+            case "cleanup-complete":
                 this.state.allowMessaging = true;
                 this.flushMessageQueue();
                 break;
@@ -171,20 +136,14 @@ export default class Broadcaster {
         }
     }
 
-    private checkWorkerStatuses() {
-        if (this.state.historyWorkerReady && this.state.inboxWorkerReady) {
-            this.flushMessageQueue();
-            this.sendUserDeviceInformation();
-        }
-    }
-
     /**
      * Sends a message to an inbox.
      * @param recipient - the name of the inboxes you want to send a message to
+     * @param senderID - the unique inbox ID provided by the `hookup()` method
      * @param data - the `MessageData` object that will be sent to the inboxes
      * @param maxAttempts - the maximum number of attempts before the message is dropped, can be set to `Infinity`
      */
-    public message(recipient: string, data: MessageData, maxAttempts = 1): void {
+    public message(recipient: string, data: MessageData, senderID = null, maxAttempts = 1): void {
         let attempts = maxAttempts;
         if (isNaN(attempts)) {
             attempts = 1;
@@ -192,6 +151,7 @@ export default class Broadcaster {
             attempts = 1;
         }
         const workerMessage: BroadcastWorkerMessage = {
+            senderID: senderID,
             recipient: recipient,
             data: data,
             messageId: uuid(),
@@ -214,6 +174,7 @@ export default class Broadcaster {
         const address = this.inboxes.length;
         this.inboxes.push(newInbox);
         const workerMessage: BroadcastWorkerMessage = {
+            senderID: newInbox.uid,
             recipient: "broadcast-worker",
             messageId: null,
             maxAttempts: 1,
@@ -233,8 +194,7 @@ export default class Broadcaster {
      */
     private postMessageToWorker(message: BroadcastWorkerMessage): void {
         if (this.state.allowMessaging) {
-            this.inboxWorker.postMessage(message);
-            this.historyWorker.postMessage(message);
+            this.worker.postMessage(message);
         } else {
             this.messageQueue.push(message);
         }
@@ -257,6 +217,7 @@ export default class Broadcaster {
         }
         this.inboxes = updatedInboxes;
         const workerMessage: BroadcastWorkerMessage = {
+            senderID: null,
             recipient: "broadcast-worker",
             messageId: null,
             maxAttempts: 1,
@@ -265,7 +226,7 @@ export default class Broadcaster {
                 addresses: updatedAddresses,
             },
         };
-        this.inboxWorker.postMessage(workerMessage);
+        this.worker.postMessage(workerMessage);
     }
 
     /**
@@ -286,6 +247,7 @@ export default class Broadcaster {
         inbox.disconnected = true;
         inbox.callback = () => {};
         const workerMessage: BroadcastWorkerMessage = {
+            senderID: null,
             recipient: "broadcast-worker",
             messageId: null,
             maxAttempts: 1,

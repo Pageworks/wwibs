@@ -7,8 +7,7 @@
         "lib",
         "wwibs.js",
         "wwibs.d.ts",
-        "inbox-worker.min.js",
-        "history-worker.min.js"
+        "wwibs-worker.min.js"
     ],
     "repository": {
         "type": "git",

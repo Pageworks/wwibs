@@ -4,5 +4,4 @@ lib
 !src/lib
 wwibs.js
 wwibs.d.ts
-history-worker.min.js
-inbox-worker.min.js
+wwibs-worker.min.js

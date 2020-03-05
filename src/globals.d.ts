@@ -1,5 +1,6 @@
 type MessageData = {
     type: string;
+    replyID?: string;
     // eslint-disable-next-line
     [key: string]: any;
 };
@@ -10,6 +11,7 @@ type Message = {
 };
 
 interface BroadcastWorkerMessage extends Message {
+    senderID: string;
     messageId: string;
     maxAttempts: number;
     attempts?: number;
