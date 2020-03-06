@@ -12,9 +12,9 @@ interface IDBEvent extends Event {
 }
 
 type Reply = {
-    uid: string;
-    senderID: number;
-    recipientIDs: Array<number>;
+    replyID: string;
+    senderID: string;
+    recipient: string;
 };
 
 class BroadcastHelper {
@@ -50,16 +50,16 @@ class BroadcastHelper {
             this.db = response.result;
 
             const historyStore = this.db.createObjectStore("history", { autoIncrement: true });
-            historyStore.createIndex("Message ID", "messageUid", { unique: false });
-            historyStore.createIndex("Recipient", "recipient", { unique: false });
-            historyStore.createIndex("Sender ID", "senderID", { unique: false });
-            historyStore.createIndex("Attempt", "attempt", { unique: false });
-            historyStore.createIndex("Message Data", "data", { unique: false });
+            historyStore.createIndex("messageUid", "messageUid", { unique: false });
+            historyStore.createIndex("recipient", "recipient", { unique: false });
+            historyStore.createIndex("senderID", "senderID", { unique: false });
+            historyStore.createIndex("attempt", "attempt", { unique: false });
+            historyStore.createIndex("data", "data", { unique: false });
 
             const replyStore = this.db.createObjectStore("reply", { autoIncrement: true });
-            replyStore.createIndex("Unique Reply ID", "replyID", { unique: true });
-            replyStore.createIndex("Recipient", "recipient", { unique: false });
-            replyStore.createIndex("Sender ID", "senderID", { unique: false });
+            replyStore.createIndex("replyID", "replyID", { unique: true });
+            replyStore.createIndex("recipient", "recipient", { unique: false });
+            replyStore.createIndex("senderID", "senderID", { unique: false });
         };
     }
 
@@ -112,6 +112,18 @@ class BroadcastHelper {
         }
     }
 
+    private lookupReply(data): Promise<Reply> {
+        return new Promise(resolve => {
+            this.db
+                .transaction("reply", "readonly")
+                .objectStore("reply")
+                .index("replyID")
+                .get(data.replyID).onsuccess = (e: IDBEvent) => {
+                resolve(e.target.result);
+            };
+        });
+    }
+
     /**
      * Quick and dirty unique ID generation.
      * This method does not follow RFC 4122 and does not guarantee a universally unique ID.
@@ -129,11 +141,11 @@ class BroadcastHelper {
      * @param data - an `InboxHookupMessage` object
      */
     private addInbox(data: InboxHookupMessage): void {
-        const { name, inboxAddress } = data;
+        const { name, inboxAddress, uid } = data;
         const inboxData: InboxData = {
             name: name.trim().toLowerCase(),
             address: inboxAddress,
-            uid: this.generateUUID(),
+            uid: uid,
         };
         this.inboxes.push(inboxData);
     }
@@ -170,16 +182,16 @@ class BroadcastHelper {
     /**
      * Creates a transaction with indexedDB to store the message within the History table.
      */
-    private async makeHistory(recipient: string, data: MessageData, messageId: string, senderID: string | null, attempt = null) {
+    private async makeHistory(message: BroadcastWorkerMessage) {
         new Promise((resolve, reject) => {
             const transaction = this.db.transaction("history", "readwrite");
             const store = transaction.objectStore("history");
             const transactionData = {
-                senderID: senderID,
-                messageUid: messageId,
-                recipient: recipient,
-                data: data,
-                attempt: attempt,
+                senderID: message?.senderID,
+                messageUid: message?.messageId,
+                recipient: message?.recipient?.trim().toLowerCase(),
+                data: message?.data,
+                attempt: message?.attempts,
             };
             store.add(transactionData);
             transaction.oncomplete = resolve;
@@ -194,7 +206,7 @@ class BroadcastHelper {
     /**
      * Creates a transaction with indexedDB to store the message within the History table.
      */
-    private async logReply(replyID: string, recipient: string, senderID: string | null) {
+    private async logReply(replyID: string, recipient: string = null, senderID: string = null) {
         new Promise((resolve, reject) => {
             const transaction = this.db.transaction("reply", "readwrite");
             const store = transaction.objectStore("reply");
@@ -220,49 +232,55 @@ class BroadcastHelper {
      * @param message - the `BroadcastWorkerMessage` object
      */
     private async lookup(message: BroadcastWorkerMessage) {
-        const { data, maxAttempts, messageId, senderID } = message;
-        const recipient = message.recipient.trim().toLowerCase();
+        this.makeHistory(message);
+        const inboxAddressIndexes: Array<number> = [];
 
-        /** Record every message in the History table */
-        this.makeHistory(recipient, data, messageId, senderID, message?.attempts);
+        if (message?.replyID) {
+            const replyData = await this.lookupReply(message);
+            for (let i = 0; i < this.inboxes.length; i++) {
+                const inbox = this.inboxes[i];
+                if (inbox.uid === replyData.senderID) {
+                    inboxAddressIndexes.push(inbox.address);
+                }
+            }
+        }
 
-        try {
-            const inboxAddressIndexes: Array<number> = [];
+        let recipient = null;
+        if (message?.recipient) {
+            recipient = message.recipient.trim().toLowerCase();
             for (let i = 0; i < this.inboxes.length; i++) {
                 const inbox = this.inboxes[i];
                 if (inbox.name === recipient) {
                     inboxAddressIndexes.push(inbox.address);
                 }
             }
+        }
 
-            if (inboxAddressIndexes.length) {
-                const response = {
-                    type: "lookup",
-                    data: data,
-                    inboxIndexes: inboxAddressIndexes,
-                };
-                if (senderID) {
-                    const replyID = this.uid();
-                    response.data = { ...data, replyID: replyID };
-                    this.logReply(replyID, recipient, senderID);
-                }
-                // @ts-ignore
-                self.postMessage(response);
-            } else if (maxAttempts > 1 && message.messageId !== null) {
-                if (message?.attempts < message.maxAttempts) {
-                    message.attempts += 1;
-                } else if (message?.attempts === message.maxAttempts) {
-                    this.dropMessageFromQueue(message.messageId);
-                } else {
-                    message.attempts = 1;
-                    this.queuedMessages.push(message);
-                    if (this.queueTimer === null) {
-                        this.queueTimer = setTimeout(this.flushMessageQueue.bind(this), this.queueTimeout);
-                    }
+        if (inboxAddressIndexes.length) {
+            const response = {
+                type: "lookup",
+                data: message.data,
+                inboxIndexes: inboxAddressIndexes,
+            };
+            if (message?.senderID) {
+                const replyID = this.uid();
+                response.data = { ...message.data, replyID: replyID };
+                this.logReply(replyID, recipient, message.senderID);
+            }
+            // @ts-ignore
+            self.postMessage(response);
+        } else if (message.maxAttempts > 1 && message.messageId !== null) {
+            if (message?.attempts < message.maxAttempts) {
+                message.attempts += 1;
+            } else if (message?.attempts === message.maxAttempts) {
+                this.dropMessageFromQueue(message.messageId);
+            } else {
+                message.attempts = 1;
+                this.queuedMessages.push(message);
+                if (this.queueTimer === null) {
+                    this.queueTimer = setTimeout(this.flushMessageQueue.bind(this), this.queueTimeout);
                 }
             }
-        } catch (error) {
-            console.error(error);
         }
     }
 

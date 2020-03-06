@@ -6,12 +6,13 @@ type MessageData = {
 };
 
 type Message = {
-    recipient: string;
+    replyID?: string;
+    recipient?: string;
     data: MessageData;
 };
 
 interface BroadcastWorkerMessage extends Message {
-    senderID: string;
+    senderID?: string;
     messageId: string;
     maxAttempts: number;
     attempts?: number;
@@ -20,6 +21,7 @@ interface BroadcastWorkerMessage extends Message {
 interface InboxHookupMessage extends MessageData {
     name: string;
     inboxAddress: number;
+    uid: string;
 }
 
 interface InboxDisconnectMessage extends MessageData {
