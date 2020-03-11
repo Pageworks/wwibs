@@ -234,20 +234,30 @@ class BroadcastHelper {
     private async lookup(message: BroadcastWorkerMessage) {
         this.makeHistory(message);
         const inboxAddressIndexes: Array<number> = [];
+        let recipient = null;
 
         if (message?.replyID) {
             const replyData = await this.lookupReply(message);
+
+            /** Sender inbox lookup */
             for (let i = 0; i < this.inboxes.length; i++) {
                 const inbox = this.inboxes[i];
                 if (inbox.uid === replyData.senderID) {
                     inboxAddressIndexes.push(inbox.address);
                 }
             }
+
+            if (message?.replyAll) {
+                recipient = replyData.recipient;
+            }
         }
 
-        let recipient = null;
         if (message?.recipient) {
             recipient = message.recipient.trim().toLowerCase();
+        }
+
+        /** Recipient inboxes lookup */
+        if (recipient) {
             for (let i = 0; i < this.inboxes.length; i++) {
                 const inbox = this.inboxes[i];
                 if (inbox.name === recipient) {

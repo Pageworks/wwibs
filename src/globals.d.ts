@@ -16,6 +16,7 @@ interface BroadcastWorkerMessage extends Message {
     messageId: string;
     maxAttempts: number;
     attempts?: number;
+    replyAll?: boolean;
 }
 
 interface InboxHookupMessage extends MessageData {

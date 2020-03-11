@@ -204,7 +204,7 @@ export default class Broadcaster {
     }
 
     /**
-     * Reply to a message.
+     * Send a reply message.
      * @param replyID - the `replyID` value attached to the recieved `MessageData` object
      * @param data - the `MessageData` object that will be sent to the sender
      * @param maxAttempts - the maximum number of attempts before the message is dropped, can be set to `Infinity`
@@ -222,6 +222,30 @@ export default class Broadcaster {
             data: data,
             messageId: uuid(),
             maxAttempts: attempts,
+        };
+        this.postMessageToWorker(workerMessage);
+    }
+
+    /**
+     * Send a reply to the sender and all original recipients.
+     * @param replyID - the `replyID` value attached to the recieved `MessageData` object
+     * @param data - the `MessageData` object that will be sent to the sender
+     * @param maxAttempts - the maximum number of attempts before the message is dropped, can be set to `Infinity`
+     */
+    public replyAll(replyID: string, data: MessageData, senderID: string = null, maxAttempts = 1): void {
+        let attempts = maxAttempts;
+        if (isNaN(attempts)) {
+            attempts = 1;
+        } else if (attempts < 1) {
+            attempts = 1;
+        }
+        const workerMessage: BroadcastWorkerMessage = {
+            replyID: replyID,
+            senderID: senderID,
+            data: data,
+            messageId: uuid(),
+            maxAttempts: attempts,
+            replyAll: true,
         };
         this.postMessageToWorker(workerMessage);
     }
