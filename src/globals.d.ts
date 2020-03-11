@@ -1,23 +1,28 @@
 type MessageData = {
     type: string;
+    replyID?: string;
     // eslint-disable-next-line
     [key: string]: any;
 };
 
 type Message = {
-    recipient: string;
+    replyID?: string;
+    recipient?: string;
     data: MessageData;
 };
 
 interface BroadcastWorkerMessage extends Message {
+    senderID?: string;
     messageId: string;
     maxAttempts: number;
     attempts?: number;
+    replyAll?: boolean;
 }
 
 interface InboxHookupMessage extends MessageData {
     name: string;
     inboxAddress: number;
+    uid: string;
 }
 
 interface InboxDisconnectMessage extends MessageData {

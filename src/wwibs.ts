@@ -4,7 +4,8 @@ let script = document.head.querySelector("script#broadcaster") || null;
 if (!script) {
     script = document.createElement("script");
     script.id = "broadcaster";
-    script.innerHTML = "window.globalManager = null;window.globalMessage = null;window.globalHookup = null;window.globalDisconnect = null;";
+    script.innerHTML =
+        "window.globalManager = null;window.globalMessage = null;window.globalHookup = null;window.globalDisconnect = null;window.globalReply = null;window.globalReplyAll = null;";
     document.head.appendChild(script);
     // @ts-ignore
     globalManager = new Broadcaster();
@@ -43,3 +44,27 @@ globalDisconnect = globalManager.disconnect.bind(globalManager);
  */
 // @ts-ignore
 export const disconnect: (inboxId: string) => void = globalDisconnect;
+
+// @ts-ignore
+globalReply = globalManager.reply.bind(globalManager);
+
+/**
+ * Send a reply message.
+ * @param replyID - the `replyID` value attached to the recieved `MessageData` object
+ * @param data - the `MessageData` object that will be sent to the sender
+ * @param maxAttempts - the maximum number of attempts before the message is dropped, can be set to `Infinity`
+ */
+// @ts-ignore
+export const reply: (replyID: string, data: MessageData, maxAttempts?: number) => void = globalReply;
+
+// @ts-ignore
+globalReplyAll = globalManager.replyAll.bind(globalManager);
+
+/**
+ * Send a reply to the sender and all original recipients.
+ * @param replyID - the `replyID` value attached to the recieved `MessageData` object
+ * @param data - the `MessageData` object that will be sent to the sender
+ * @param maxAttempts - the maximum number of attempts before the message is dropped, can be set to `Infinity`
+ */
+// @ts-ignore
+export const replyAll: (replyID: string, data: MessageData, maxAttempts?: number) => void = globalReplyAll;
