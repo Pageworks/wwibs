@@ -37,13 +37,11 @@ class BroadcastHelper {
 
         const request = indexedDB.open(`${this.dbUid}`, 1);
         request.onsuccess = (e: IDBEvent) => {
-            // @ts-ignore
-            self.postMessage({
-                recipient: "broadcaster",
-                data: {
-                    type: "worker-ready",
-                },
-            });
+            this.sendReadyMessage();
+        };
+        request.onerror = () => {
+            console.warn("Failed to create database, using array fallback.");
+            this.sendReadyMessage();
         };
         request.onupgradeneeded = (e: Event) => {
             const response = e.target as IDBOpenDBRequest;
@@ -112,15 +110,34 @@ class BroadcastHelper {
         }
     }
 
+    private sendReadyMessage() {
+        // @ts-ignore
+        self.postMessage({
+            recipient: "broadcaster",
+            data: {
+                type: "worker-ready",
+            },
+        });
+    }
+
     private lookupReply(data): Promise<Reply> {
         return new Promise(resolve => {
-            this.db
-                .transaction("reply", "readonly")
-                .objectStore("reply")
-                .index("replyID")
-                .get(data.replyID).onsuccess = (e: IDBEvent) => {
-                resolve(e.target.result);
-            };
+            if (this.db) {
+                this.db
+                    .transaction("reply", "readonly")
+                    .objectStore("reply")
+                    .index("replyID")
+                    .get(data.replyID).onsuccess = (e: IDBEvent) => {
+                    resolve(e.target.result);
+                };
+            } else {
+                for (let i = 0; i < this.fallbackReplies.length; i++) {
+                    if (this.fallbackReplies[i].replyID === data.replyID) {
+                        resolve(this.fallbackReplies[i]);
+                        break;
+                    }
+                }
+            }
         });
     }
 
@@ -183,6 +200,9 @@ class BroadcastHelper {
      * Creates a transaction with indexedDB to store the message within the History table.
      */
     private async makeHistory(message: BroadcastWorkerMessage) {
+        if (!this.db) {
+            return;
+        }
         new Promise((resolve, reject) => {
             const transaction = this.db.transaction("history", "readwrite");
             const store = transaction.objectStore("history");
@@ -207,22 +227,31 @@ class BroadcastHelper {
      * Creates a transaction with indexedDB to store the message within the History table.
      */
     private async logReply(replyID: string, recipient: string = null, senderID: string = null) {
-        new Promise((resolve, reject) => {
-            const transaction = this.db.transaction("reply", "readwrite");
-            const store = transaction.objectStore("reply");
-            const transactionData = {
+        if (this.db) {
+            new Promise((resolve, reject) => {
+                const transaction = this.db.transaction("reply", "readwrite");
+                const store = transaction.objectStore("reply");
+                const transactionData = {
+                    replyID: replyID,
+                    recipient: recipient,
+                    senderID: senderID,
+                };
+                store.add(transactionData);
+                transaction.oncomplete = resolve;
+                transaction.onerror = reject;
+            })
+                .then(() => {})
+                .catch(error => {
+                    console.error(`Failed to write to the Reply table:`, error);
+                });
+        } else {
+            const reply = {
                 replyID: replyID,
                 recipient: recipient,
                 senderID: senderID,
             };
-            store.add(transactionData);
-            transaction.oncomplete = resolve;
-            transaction.onerror = reject;
-        })
-            .then(() => {})
-            .catch(error => {
-                console.error(`Failed to write to the Reply table:`, error);
-            });
+            this.fallbackReplies.push(reply);
+        }
     }
 
     /**
