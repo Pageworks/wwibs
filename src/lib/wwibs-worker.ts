@@ -36,7 +36,7 @@ class BroadcastHelper {
         this.dbUid = this.uid();
 
         const request = indexedDB.open(`${this.dbUid}`, 1);
-        request.onsuccess = (e: IDBEvent) => {
+        request.onsuccess = () => {
             this.sendReadyMessage();
         };
         request.onerror = () => {
