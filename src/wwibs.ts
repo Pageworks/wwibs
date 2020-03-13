@@ -19,10 +19,11 @@ globalMessage = globalManager.message.bind(globalManager);
  * Sends a message to an inbox.
  * @param recipient - the name of the inboxes you want to send a message to
  * @param data - the `MessageData` object that will be sent to the inboxes
+ * @param senderID - the unique inbox ID provided by the `hookup()` method
  * @param maxAttempts - the maximum number of attempts before the message is dropped, can be set to `Infinity`
  */
 // @ts-ignore
-export const message: (recipient: string, data: { type: string; [key: string]: any }, maxAttempts?: number) => void = globalMessage;
+export const message: (recipient: string, data: MessageData, senderID?: string, maxAttempts?: number) => void = globalMessage;
 
 // @ts-ignore
 globalHookup = globalManager.hookup.bind(globalManager);
@@ -53,10 +54,11 @@ globalReply = globalManager.reply.bind(globalManager);
  * Send a reply message.
  * @param replyID - the `replyID` value attached to the recieved `MessageData` object
  * @param data - the `MessageData` object that will be sent to the sender
+ * @param senderID - the unique inbox ID provided by the `hookup()` method
  * @param maxAttempts - the maximum number of attempts before the message is dropped, can be set to `Infinity`
  */
 // @ts-ignore
-export const reply: (replyID: string, data: MessageData, maxAttempts?: number) => void = globalReply;
+export const reply: (replyID: string, data: MessageData, senderID?: string, maxAttempts?: number) => void = globalReply;
 
 // @ts-ignore
 globalReplyAll = globalManager.replyAll.bind(globalManager);
@@ -65,7 +67,8 @@ globalReplyAll = globalManager.replyAll.bind(globalManager);
  * Send a reply to the sender and all original recipients.
  * @param replyID - the `replyID` value attached to the recieved `MessageData` object
  * @param data - the `MessageData` object that will be sent to the sender
+ * @param senderID - the unique inbox ID provided by the `hookup()` method
  * @param maxAttempts - the maximum number of attempts before the message is dropped, can be set to `Infinity`
  */
 // @ts-ignore
-export const replyAll: (replyID: string, data: MessageData, maxAttempts?: number) => void = globalReplyAll;
+export const replyAll: (replyID: string, data: MessageData, senderID?: string, maxAttempts?: number) => void = globalReplyAll;
