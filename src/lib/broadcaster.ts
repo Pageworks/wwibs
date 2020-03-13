@@ -140,8 +140,8 @@ export default class Broadcaster {
     /**
      * Sends a message to an inbox.
      * @param recipient - the name of the inboxes you want to send a message to
-     * @param senderID - the unique inbox ID provided by the `hookup()` method
      * @param data - the `MessageData` object that will be sent to the inboxes
+     * @param senderID - the unique inbox ID provided by the `hookup()` method
      * @param maxAttempts - the maximum number of attempts before the message is dropped, can be set to `Infinity`
      */
     public message(recipient: string, data: MessageData, senderID = null, maxAttempts = 1): void {
@@ -208,6 +208,7 @@ export default class Broadcaster {
      * Send a reply message.
      * @param replyID - the `replyID` value attached to the recieved `MessageData` object
      * @param data - the `MessageData` object that will be sent to the sender
+     * @param senderID - the unique inbox ID provided by the `hookup()` method
      * @param maxAttempts - the maximum number of attempts before the message is dropped, can be set to `Infinity`
      */
     public reply(replyID: string, data: MessageData, senderID: string = null, maxAttempts = 1): void {
@@ -231,6 +232,7 @@ export default class Broadcaster {
      * Send a reply to the sender and all original recipients.
      * @param replyID - the `replyID` value attached to the recieved `MessageData` object
      * @param data - the `MessageData` object that will be sent to the sender
+     * @param senderID - the unique inbox ID provided by the `hookup()` method
      * @param maxAttempts - the maximum number of attempts before the message is dropped, can be set to `Infinity`
      */
     public replyAll(replyID: string, data: MessageData, senderID: string = null, maxAttempts = 1): void {
