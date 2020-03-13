@@ -5,3 +5,4 @@ lib
 wwibs.js
 wwibs.d.ts
 wwibs-worker.min.js
+types.d.ts

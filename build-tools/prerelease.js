@@ -55,10 +55,24 @@ function minify(inputPath, outputPath) {
     });
 }
 
+function cloneTypes() {
+    return new Promise((resolve, reject) => {
+        const input = path.join(cwd, "src/types.d.ts");
+        const output = path.join(cwd, "types.d.ts");
+        fs.copyFile(input, output, error => {
+            if (error) {
+                reject(error);
+            }
+            resolve();
+        });
+    });
+}
+
 async function run() {
     try {
         await minify("lib/wwibs-worker.js", "wwibs-worker.min.js");
         await setVersion();
+        await cloneTypes();
     } catch (error) {
         console.log(error);
         process.exit(1);

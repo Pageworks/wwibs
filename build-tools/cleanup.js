@@ -17,3 +17,8 @@ const mainDeclaration = path.join(cwd, "wwibs.d.ts");
 if (fs.existsSync(mainDeclaration)) {
     fs.unlinkSync(mainDeclaration);
 }
+
+const types = path.join(cwd, "types.d.ts");
+if (fs.existsSync(types)) {
+    fs.unlinkSync(types);
+}

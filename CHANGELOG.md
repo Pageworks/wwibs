@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.8] - 2020-03-13
+
+### Fixed
+
+-   added missing TypeScript declaration files
+
 ## [0.0.7] - 2020-03-13
 
 ### Fixed
@@ -54,7 +60,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 -   prerelease script to prepare broadcaster worker script for CDN
 -   broadcaster export declarations
 
-[unreleased]: https://github.com/Pageworks/wwibs/compare/v0.0.7...HEAD
+[unreleased]: https://github.com/Pageworks/wwibs/compare/v0.0.8...HEAD
+[0.0.8]: https://github.com/Pageworks/wwibs/releases/tag/v0.0.8...v0.0.7
 [0.0.7]: https://github.com/Pageworks/wwibs/releases/tag/v0.0.7...v0.0.6
 [0.0.6]: https://github.com/Pageworks/wwibs/releases/tag/v0.0.6...v0.0.5
 [0.0.5]: https://github.com/Pageworks/wwibs/releases/tag/v0.0.5...v0.0.4
