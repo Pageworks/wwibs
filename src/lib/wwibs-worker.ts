@@ -1,3 +1,5 @@
+import { BroadcastWorkerMessage, UserDeviceInfoMessage, InboxHookupMessage, InboxDisconnectMessage, InboxUpdateMessage, MessageData } from "../types";
+
 type InboxData = {
     name: string;
     address: number;

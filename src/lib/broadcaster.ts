@@ -1,4 +1,5 @@
 import { uuid } from "./utils";
+import { BroadcastWorkerMessage, MessageData } from "../types";
 
 type Inbox = {
     callback: Function;

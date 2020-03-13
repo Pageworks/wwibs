@@ -1,4 +1,5 @@
 import Broadcaster from "./lib/broadcaster";
+import { MessageData } from "./types";
 
 let script = document.head.querySelector("script#broadcaster") || null;
 if (!script) {

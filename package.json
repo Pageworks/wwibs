@@ -1,13 +1,14 @@
 {
     "name": "wwibs",
-    "version": "0.0.7",
+    "version": "0.0.8",
     "description": "A performance-focused Web Worker Interfacing & Broadcasting System",
     "main": "wwibs.js",
     "files": [
         "lib",
         "wwibs.js",
         "wwibs.d.ts",
-        "wwibs-worker.min.js"
+        "wwibs-worker.min.js",
+        "types.d.ts"
     ],
     "repository": {
         "type": "git",
