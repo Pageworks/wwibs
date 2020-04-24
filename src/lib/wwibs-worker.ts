@@ -171,7 +171,7 @@ class BroadcastHelper {
 
     private removeInbox(data: InboxDisconnectMessage): void {
         const { inboxAddress } = data;
-        for (let i = 0; i < this.inboxes.length; i++) {
+        for (let i = this.inboxes.length - 1; i >= 0; i--) {
             if (this.inboxes[i].address === inboxAddress) {
                 this.inboxes.splice(i, 1);
                 break;
@@ -310,7 +310,11 @@ class BroadcastHelper {
             }
             // @ts-ignore
             self.postMessage(response);
-        } else if (message.maxAttempts > 1 && message.messageId !== null) {
+
+            if (message?.attempts) {
+                this.dropMessageFromQueue(message.messageId);
+            }
+        } else if (message.maxAttempts > 1) {
             if (message?.attempts < message.maxAttempts) {
                 message.attempts += 1;
             } else if (message?.attempts === message.maxAttempts) {
