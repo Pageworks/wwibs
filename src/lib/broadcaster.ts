@@ -144,7 +144,7 @@ export default class Broadcaster {
         const message: BroadcastWorkerMessage = {
             recipient: data.recipient,
             type: data.type,
-            data: data.data,
+            data: data?.data ?? {},
             senderId: data?.senderId ?? null,
             maxAttempts: data?.maxAttempts ?? 1,
             messageId: uuid(),
@@ -202,7 +202,7 @@ export default class Broadcaster {
         const message: BroadcastWorkerMessage = {
             replyId: data.replyId,
             type: data.type,
-            data: data.data,
+            data: data?.data ?? {},
             senderId: data?.senderId ?? null,
             maxAttempts: data?.maxAttempts ?? 1,
             messageId: uuid(),
@@ -217,7 +217,7 @@ export default class Broadcaster {
         const message: BroadcastWorkerMessage = {
             replyId: data.replyId,
             type: data.type,
-            data: data.data,
+            data: data?.data ?? {},
             senderId: data?.senderId ?? null,
             maxAttempts: data?.maxAttempts ?? 1,
             messageId: uuid(),

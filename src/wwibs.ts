@@ -18,7 +18,7 @@ globalMessage = globalManager.message.bind(globalManager);
  * Sends a message to an inbox.
  */
 // @ts-ignore
-export const message: (settings: { recipient: string; type: string; data: { [key: string]: any }; maxAttempts?: number; senderId?: string }) => void = globalMessage;
+export const message: (settings: { recipient: string; type: string; data?: { [key: string]: any }; maxAttempts?: number; senderId?: string }) => void = globalMessage;
 
 // @ts-ignore
 globalHookup = globalManager.hookup.bind(globalManager);
@@ -49,7 +49,7 @@ globalReply = globalManager.reply.bind(globalManager);
  * Send a reply message.
  */
 // @ts-ignore
-export const reply: (settings: { replyId: string; type: string; data: { [key: string]: any }; maxAttempts?: number; senderId?: string }) => void = globalReply;
+export const reply: (settings: { replyId: string; type: string; data?: { [key: string]: any }; maxAttempts?: number; senderId?: string }) => void = globalReply;
 
 // @ts-ignore
 globalReplyAll = globalManager.replyAll.bind(globalManager);
@@ -58,4 +58,4 @@ globalReplyAll = globalManager.replyAll.bind(globalManager);
  * Send a reply to the sender and all original recipients.
  */
 // @ts-ignore
-export const replyAll: (settings: { replyId: string; type: string; data: { [key: string]: any }; maxAttempts?: number; senderId?: string }) => void = globalReplyAll;
+export const replyAll: (settings: { replyId: string; type: string; data?: { [key: string]: any }; maxAttempts?: number; senderId?: string }) => void = globalReplyAll;
