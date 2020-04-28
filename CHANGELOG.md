@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0] - 2020-04-28
+
 ### Fixed
 
 -   fixed infinite message bug
@@ -102,7 +104,8 @@ type settings = {
 -   prerelease script to prepare broadcaster worker script for CDN
 -   broadcaster export declarations
 
-[unreleased]: https://github.com/Pageworks/wwibs/compare/v0.0.9...HEAD
+[unreleased]: https://github.com/Pageworks/wwibs/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/Pageworks/wwibs/releases/tag/v0.1.0...v0.0.9
 [0.0.9]: https://github.com/Pageworks/wwibs/releases/tag/v0.0.9...v0.0.8
 [0.0.8]: https://github.com/Pageworks/wwibs/releases/tag/v0.0.8...v0.0.7
 [0.0.7]: https://github.com/Pageworks/wwibs/releases/tag/v0.0.7...v0.0.6
