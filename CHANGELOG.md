@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1] - 2020-04-28
+
+### Fixed
+
+-   bugs with the new message & reply format
+-   missing worker version variable
+
 ## [0.1.0] - 2020-04-28
 
 ### Fixed
@@ -104,7 +111,8 @@ type settings = {
 -   prerelease script to prepare broadcaster worker script for CDN
 -   broadcaster export declarations
 
-[unreleased]: https://github.com/Pageworks/wwibs/compare/v0.1.0...HEAD
+[unreleased]: https://github.com/Pageworks/wwibs/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/Pageworks/wwibs/releases/tag/v0.1.1...v0.1.0
 [0.1.0]: https://github.com/Pageworks/wwibs/releases/tag/v0.1.0...v0.0.9
 [0.0.9]: https://github.com/Pageworks/wwibs/releases/tag/v0.0.9...v0.0.8
 [0.0.8]: https://github.com/Pageworks/wwibs/releases/tag/v0.0.8...v0.0.7
