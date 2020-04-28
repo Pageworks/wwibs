@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 -   fixed infinite message bug
+-   updates NPM packages
 
 ## [0.0.9] - 2020-03-13
 
