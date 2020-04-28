@@ -1,6 +1,6 @@
 {
     "name": "wwibs",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "description": "A performance-focused Web Worker Interfacing & Broadcasting System",
     "main": "wwibs.js",
     "files": [

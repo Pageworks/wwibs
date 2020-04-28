@@ -201,6 +201,7 @@ export default class Broadcaster {
     public reply(data): void {
         const message: BroadcastWorkerMessage = {
             replyId: data.replyId,
+            type: data.type,
             data: data.data,
             senderId: data?.senderId ?? null,
             maxAttempts: data?.maxAttempts ?? 1,
@@ -215,6 +216,7 @@ export default class Broadcaster {
     public replyAll(data): void {
         const message: BroadcastWorkerMessage = {
             replyId: data.replyId,
+            type: data.type,
             data: data.data,
             senderId: data?.senderId ?? null,
             maxAttempts: data?.maxAttempts ?? 1,
