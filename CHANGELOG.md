@@ -7,6 +7,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+-   fixed infinite message bug
+-   updates NPM packages
+
+### Reworked
+
+-   `message()` and `reply()` and `replyAll()` methods require a settings object
+
+**Message**
+
+```typescript
+type settings = {
+    recipient: string;
+    type: string;
+    data: {
+        [key: string]: any;
+    };
+    senderId?: string;
+    maxAttempts?: number;
+};
+```
+
+**Reply**
+
+```typescript
+type settings = {
+    replyId: string;
+    data: {
+        [key: string]: any;
+    };
+    senderId?: string;
+    maxAttempts?: number;
+};
+```
+
 ## [0.0.9] - 2020-03-13
 
 ### Fixed

@@ -14,8 +14,8 @@ interface IDBEvent extends Event {
 }
 
 type Reply = {
-    replyID: string;
-    senderID: string;
+    replyId: string;
+    senderId: string;
     recipient: string;
 };
 
@@ -52,14 +52,14 @@ class BroadcastHelper {
             const historyStore = this.db.createObjectStore("history", { autoIncrement: true });
             historyStore.createIndex("messageUid", "messageUid", { unique: false });
             historyStore.createIndex("recipient", "recipient", { unique: false });
-            historyStore.createIndex("senderID", "senderID", { unique: false });
+            historyStore.createIndex("senderId", "senderId", { unique: false });
             historyStore.createIndex("attempt", "attempt", { unique: false });
             historyStore.createIndex("data", "data", { unique: false });
 
             const replyStore = this.db.createObjectStore("reply", { autoIncrement: true });
-            replyStore.createIndex("replyID", "replyID", { unique: true });
+            replyStore.createIndex("replyId", "replyId", { unique: true });
             replyStore.createIndex("recipient", "recipient", { unique: false });
-            replyStore.createIndex("senderID", "senderID", { unique: false });
+            replyStore.createIndex("senderId", "senderId", { unique: false });
         };
     }
 
@@ -128,13 +128,13 @@ class BroadcastHelper {
                 this.db
                     .transaction("reply", "readonly")
                     .objectStore("reply")
-                    .index("replyID")
-                    .get(data.replyID).onsuccess = (e: IDBEvent) => {
+                    .index("replyId")
+                    .get(data.replyId).onsuccess = (e: IDBEvent) => {
                     resolve(e.target.result);
                 };
             } else {
                 for (let i = 0; i < this.fallbackReplies.length; i++) {
-                    if (this.fallbackReplies[i].replyID === data.replyID) {
+                    if (this.fallbackReplies[i].replyId === data.replyId) {
                         resolve(this.fallbackReplies[i]);
                         break;
                     }
@@ -171,7 +171,7 @@ class BroadcastHelper {
 
     private removeInbox(data: InboxDisconnectMessage): void {
         const { inboxAddress } = data;
-        for (let i = 0; i < this.inboxes.length; i++) {
+        for (let i = this.inboxes.length - 1; i >= 0; i--) {
             if (this.inboxes[i].address === inboxAddress) {
                 this.inboxes.splice(i, 1);
                 break;
@@ -209,7 +209,7 @@ class BroadcastHelper {
             const transaction = this.db.transaction("history", "readwrite");
             const store = transaction.objectStore("history");
             const transactionData = {
-                senderID: message?.senderID,
+                senderId: message?.senderId,
                 messageUid: message?.messageId,
                 recipient: message?.recipient?.trim().toLowerCase(),
                 data: message?.data,
@@ -228,15 +228,15 @@ class BroadcastHelper {
     /**
      * Creates a transaction with indexedDB to store the message within the History table.
      */
-    private async logReply(replyID: string, recipient: string = null, senderID: string = null) {
+    private async logReply(replyId: string, recipient: string = null, senderId: string = null) {
         if (this.db) {
             new Promise((resolve, reject) => {
                 const transaction = this.db.transaction("reply", "readwrite");
                 const store = transaction.objectStore("reply");
                 const transactionData = {
-                    replyID: replyID,
+                    replyId: replyId,
                     recipient: recipient,
-                    senderID: senderID,
+                    senderId: senderId,
                 };
                 store.add(transactionData);
                 transaction.oncomplete = resolve;
@@ -248,9 +248,9 @@ class BroadcastHelper {
                 });
         } else {
             const reply = {
-                replyID: replyID,
+                replyId: replyId,
                 recipient: recipient,
-                senderID: senderID,
+                senderId: senderId,
             };
             this.fallbackReplies.push(reply);
         }
@@ -267,13 +267,13 @@ class BroadcastHelper {
         const inboxAddressIndexes: Array<number> = [];
         let recipient = null;
 
-        if (message?.replyID) {
+        if (message?.replyId) {
             const replyData = await this.lookupReply(message);
 
             /** Sender inbox lookup */
             for (let i = 0; i < this.inboxes.length; i++) {
                 const inbox = this.inboxes[i];
-                if (inbox.uid === replyData.senderID) {
+                if (inbox.uid === replyData.senderId) {
                     inboxAddressIndexes.push(inbox.address);
                 }
             }
@@ -303,14 +303,21 @@ class BroadcastHelper {
                 data: message.data,
                 inboxIndexes: inboxAddressIndexes,
             };
-            if (message?.senderID) {
-                const replyID = this.uid();
-                response.data = { ...message.data, replyID: replyID };
-                this.logReply(replyID, recipient, message.senderID);
+            if (message?.type) {
+                response.data["type"] = message.type;
+            }
+            if (message?.senderId) {
+                const replyId = this.uid();
+                response.data["replyId"] = replyId;
+                this.logReply(replyId, recipient, message.senderId);
             }
             // @ts-ignore
             self.postMessage(response);
-        } else if (message.maxAttempts > 1 && message.messageId !== null) {
+
+            if (message?.attempts) {
+                this.dropMessageFromQueue(message.messageId);
+            }
+        } else if (message.maxAttempts > 1) {
             if (message?.attempts < message.maxAttempts) {
                 message.attempts += 1;
             } else if (message?.attempts === message.maxAttempts) {
