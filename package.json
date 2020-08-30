@@ -46,7 +46,7 @@
         "compile": "npm run cleanup && tsc",
         "prerelease": "npm run lint && npm run compile && node ./build-tools/prerelease.js",
         "docs": "docs",
-        "predeploy": "docs -o ./public",
+        "predeploy": "docs -o ./public -c ./CNAME",
         "deploy": "node ./build-tools/deploy.js"
     }
 }
