@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <title>Disconnect Inboxes</title>
+
+        <link href="/normalize.css" rel="stylesheet" />
+        <link href="/reset.css" rel="stylesheet" />
+        <link href="/brixi.css" rel="stylesheet" />
+        <link href="/base.css" rel="stylesheet" />
+
+        <script defer src="/prism.js"></script>
+        <link href="/prism.css" rel="stylesheet" />
+
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+        <script defer src="/nav.js"></script>
+        <script defer src="/page-jump-generator.js"></script>
+    </head>
+    <body>
+        <main>
+            <aside><nav><header>Documents</header><a href="/disconnect-inboxes" data-slug="/disconnect-inboxes"><span>disconnect inboxes</span></a><a href="/hookup-inboxes" data-slug="/hookup-inboxes"><span>hookup inboxes</span></a><a href="/memory-management" data-slug="/memory-management"><span>memory management</span></a><a href="/readme" data-slug="/readme"><span>readme</span></a><a href="/sending-messages" data-slug="/sending-messages"><span>sending messages</span></a></nav></aside>
+            <article><h2 id="disconnect">Disconnect</h2>
+<p>The <code>disconnect()</code> method is used to disconnect an inbox from the messaging system. It requires the inbox unique ID that was provided from the hookup.</p>
+<pre><code class="javascript language-javascript">import { disconnect } from "wwibs";
+
+class ExampleComponent extends HTMLElement {
+    connectedCallback() {
+        this.inboxUid = hookup("example", this.inbox.bind(this));
+    }
+    disconnectedCallback() {
+        disconnect(this.inboxUid);
+    }
+}
+</code></pre></article>
+        </main>
+    </body>
+</html>

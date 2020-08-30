@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <title>Sending Messages</title>
+
+        <link href="/normalize.css" rel="stylesheet" />
+        <link href="/reset.css" rel="stylesheet" />
+        <link href="/brixi.css" rel="stylesheet" />
+        <link href="/base.css" rel="stylesheet" />
+
+        <script defer src="/prism.js"></script>
+        <link href="/prism.css" rel="stylesheet" />
+
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+        <script defer src="/nav.js"></script>
+        <script defer src="/page-jump-generator.js"></script>
+    </head>
+    <body>
+        <main>
+            <aside><nav><header>Documents</header><a href="/disconnect-inboxes" data-slug="/disconnect-inboxes"><span>disconnect inboxes</span></a><a href="/hookup-inboxes" data-slug="/hookup-inboxes"><span>hookup inboxes</span></a><a href="/memory-management" data-slug="/memory-management"><span>memory management</span></a><a href="/readme" data-slug="/readme"><span>readme</span></a><a href="/sending-messages" data-slug="/sending-messages"><span>sending messages</span></a></nav></aside>
+            <article><h1 id="sendingmessages">Sending Messages</h1>
+<p>WWIBS uses a modified version of the <a href="https://en.wikipedia.org/wiki/Actor_model">Actor Model</a>. The key difference is that not all controllers within the system are Actors. Developers will choose what controllers will become actors by registering an inbox. However, any controller within the system can send messages to Actors by using the Broadcaster class.</p>
+<h2 id="message">Message</h2>
+<p><strong>Message Settings</strong></p>
+<pre><code class="typescript language-typescript">type settings = {
+    recipient: string;
+    type: string;
+    data: {
+        [key: string]: any;
+    };
+    senderId?: string;
+    maxAttempts?: number;
+};
+</code></pre>
+<p><strong>Example</strong></p>
+<pre><code class="javascript language-javascript">import { message } from "wwibs";
+
+message({
+    recipient: "inbox-alias",
+    type: "message",
+    data: {
+        message: "This is an example",
+    },
+});
+</code></pre>
+<h2 id="reply">Reply</h2>
+<p>If a sender provides a <code>senderId</code> value the <code>data</code> object sent to the inbox will contain a <code>replyId</code> value. You can use this value to respond directly to the sender using <code>reply()</code> or you can reply to the sender and all the other recipients using <code>replyAll()</code></p>
+<p><strong>Reply Settings</strong></p>
+<pre><code class="typescript language-typescript">type settings = {
+    replyId: string;
+    type: string;
+    data: {
+        [key: string]: any;
+    };
+    senderId?: string;
+    maxAttempts?: number;
+};
+</code></pre>
+<p><strong>Example</strong></p>
+<pre><code class="javascript language-javascript">import { reply } from "wwibs";
+
+inbox(data){
+    switch (data.type){
+        case "message":
+            console.log(data.message);
+            reply({
+                replyId: data.replyId,
+                type: 'message',
+                data: {
+                    message: 'This is an example response'
+                }
+            });
+            break;
+        default:
+            console.warn(`Undefined message type: ${data.type}`);
+            break;
+    }
+}
+</code></pre></article>
+        </main>
+    </body>
+</html>
