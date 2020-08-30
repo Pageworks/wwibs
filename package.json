@@ -27,6 +27,7 @@
     },
     "homepage": "https://github.com/Pageworks/wwibs#readme",
     "devDependencies": {
+        "@codewithkyle/dev-docs": "^0.1.13",
         "@typescript-eslint/eslint-plugin": "^2.30.0",
         "@typescript-eslint/parser": "^2.30.0",
         "eslint": "^6.8.0",
@@ -42,6 +43,7 @@
         "lint": "npm run prettier && npm run eslint",
         "cleanup": "node ./build-tools/cleanup.js",
         "compile": "npm run cleanup && tsc",
-        "prerelease": "npm run lint && npm run compile && node ./build-tools/prerelease.js"
+        "prerelease": "npm run lint && npm run compile && node ./build-tools/prerelease.js",
+        "docs": "docs"
     }
 }
