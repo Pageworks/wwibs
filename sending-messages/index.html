@@ -21,7 +21,7 @@
     </head>
     <body>
         <main>
-            <aside><nav><header>Documents</header><a href="/disconnect-inboxes" data-slug="/disconnect-inboxes"><span>disconnect inboxes</span></a><a href="/hookup-inboxes" data-slug="/hookup-inboxes"><span>hookup inboxes</span></a><a href="/memory-management" data-slug="/memory-management"><span>memory management</span></a><a href="/readme" data-slug="/readme"><span>readme</span></a><a href="/sending-messages" data-slug="/sending-messages"><span>sending messages</span></a></nav></aside>
+            <aside><nav><a href="/" class="project-name">WWIBS</a><a href="https://github.com/Pageworks/wwibs"><span>GitHub</span></a><a href="https://www.npmjs.com/package/wwibs"><span>NPM</span></a><header>Documents</header><a href="/disconnect-inboxes" data-slug="/disconnect-inboxes"><span>disconnect inboxes</span></a><a href="/hookup-inboxes" data-slug="/hookup-inboxes"><span>hookup inboxes</span></a><a href="/memory-management" data-slug="/memory-management"><span>memory management</span></a><a href="/readme" data-slug="/readme"><span>readme</span></a><a href="/sending-messages" data-slug="/sending-messages"><span>sending messages</span></a></nav></aside>
             <article><h1 id="sendingmessages">Sending Messages</h1>
 <p>WWIBS uses a modified version of the <a href="https://en.wikipedia.org/wiki/Actor_model">Actor Model</a>. The key difference is that not all controllers within the system are Actors. Developers will choose what controllers will become actors by registering an inbox. However, any controller within the system can send messages to Actors by using the Broadcaster class.</p>
 <h2 id="message">Message</h2>
