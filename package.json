@@ -28,15 +28,15 @@
     "homepage": "https://github.com/Pageworks/wwibs#readme",
     "devDependencies": {
         "@codewithkyle/dev-docs": "^0.1.13",
-        "@typescript-eslint/eslint-plugin": "^2.30.0",
-        "@typescript-eslint/parser": "^2.30.0",
+        "@typescript-eslint/eslint-plugin": "^2.34.0",
+        "@typescript-eslint/parser": "^2.34.0",
         "eslint": "^6.8.0",
         "eslint-config-prettier": "^6.11.0",
-        "eslint-plugin-prettier": "^3.1.3",
+        "eslint-plugin-prettier": "^3.1.4",
         "gh-pages": "^3.1.0",
         "prettier": "^1.19.1",
-        "terser": "^4.6.12",
-        "typescript": "^3.8.3"
+        "terser": "^4.8.0",
+        "typescript": "^3.9.7"
     },
     "scripts": {
         "prettier": "prettier --write \"src/**/*.ts\"",
