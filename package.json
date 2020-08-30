@@ -47,6 +47,6 @@
         "prerelease": "npm run lint && npm run compile && node ./build-tools/prerelease.js",
         "docs": "docs",
         "predeploy": "docs -o ./public",
-        "deploy": "node ./deploy.js"
+        "deploy": "node ./build-tools/deploy.js"
     }
 }
