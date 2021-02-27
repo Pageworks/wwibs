@@ -1,10 +1,13 @@
 {
     "name": "wwibs",
-    "version": "0.1.2",
-    "description": "A performance-focused Web Worker Interfacing & Broadcasting System",
+    "version": "0.2.0",
+    "description": "A performance-focused Web Worker Based Broadcasting System",
     "main": "wwibs.js",
     "files": [
-        "lib",
+        "lib/broadcaster.js",
+        "lib/broadcaster.d.ts",
+        "lib/utils.js",
+        "lib/utils.d.ts",
         "wwibs.js",
         "wwibs.d.ts",
         "wwibs-worker.min.js",
@@ -27,16 +30,16 @@
     },
     "homepage": "https://github.com/Pageworks/wwibs#readme",
     "devDependencies": {
-        "@codewithkyle/dev-docs": "^0.1.13",
+        "@codewithkyle/dev-docs": "^0.1.14",
         "@typescript-eslint/eslint-plugin": "^2.34.0",
         "@typescript-eslint/parser": "^2.34.0",
         "eslint": "^6.8.0",
-        "eslint-config-prettier": "^6.11.0",
-        "eslint-plugin-prettier": "^3.1.4",
+        "eslint-config-prettier": "^6.15.0",
+        "eslint-plugin-prettier": "^3.3.1",
         "gh-pages": "^3.1.0",
         "prettier": "^1.19.1",
         "terser": "^4.8.0",
-        "typescript": "^3.9.7"
+        "typescript": "^4.2.2"
     },
     "scripts": {
         "prettier": "prettier --write \"src/**/*.ts\"",
