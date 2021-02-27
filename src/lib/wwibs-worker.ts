@@ -26,7 +26,7 @@ class BroadcastHelper {
     private inboxes: Array<InboxData>;
     private db: IDBDatabase;
     private fallbackReplies: Array<Reply>;
-    private dbUid: string;
+    private dbName: string;
 
     constructor() {
         self.onmessage = this.handleMessage.bind(this);
@@ -35,11 +35,12 @@ class BroadcastHelper {
         this.inboxes = [];
         this.db = null;
         this.fallbackReplies = [];
-        this.dbUid = this.uid();
+        this.dbName = `wwibs-reply-log`;
 
-        const request = indexedDB.open(`${this.dbUid}`, 1);
+        const request = indexedDB.open(this.dbName, 1);
         request.onsuccess = () => {
             this.sendReadyMessage();
+            this.purgeOldReplies();
         };
         request.onerror = () => {
             console.warn("Failed to create database, using array fallback.");
@@ -49,17 +50,28 @@ class BroadcastHelper {
             const response = e.target as IDBOpenDBRequest;
             this.db = response.result;
 
-            const historyStore = this.db.createObjectStore("history", { autoIncrement: true });
-            historyStore.createIndex("messageUid", "messageUid", { unique: false });
-            historyStore.createIndex("recipient", "recipient", { unique: false });
-            historyStore.createIndex("senderId", "senderId", { unique: false });
-            historyStore.createIndex("attempt", "attempt", { unique: false });
-            historyStore.createIndex("data", "data", { unique: false });
-
-            const replyStore = this.db.createObjectStore("reply", { autoIncrement: true });
+            const replyStore = this.db.createObjectStore("reply", { keyPath: "replyId", autoIncrement: true });
             replyStore.createIndex("replyId", "replyId", { unique: true });
             replyStore.createIndex("recipient", "recipient", { unique: false });
             replyStore.createIndex("senderId", "senderId", { unique: false });
+            replyStore.createIndex("createdAt", "createdAt", { unique: false });
+        };
+    }
+
+    private purgeOldReplies() {
+        const transaction = this.db.transaction("reply", "readwrite");
+        const store = transaction.objectStore("reply");
+        const replies = store.getAll();
+        replies.onsuccess = (e: IDBEvent) => {
+            const rows = e.target.result;
+            const now = Date.now();
+            for (let i = 0; i < rows.length; i++) {
+                const createdAt = rows[i].createdAt;
+                // Older than 1 day
+                if (now - createdAt > 86400000) {
+                    store.delete(rows[i].replyId);
+                }
+            }
         };
     }
 
@@ -80,11 +92,6 @@ class BroadcastHelper {
                 break;
             case "init":
                 this.handleUserDeviceInfo(data as UserDeviceInfoMessage);
-                break;
-            case "unload":
-                if (this.db) {
-                    indexedDB.deleteDatabase(this.dbUid);
-                }
                 break;
             default:
                 console.error(`Unknown broadcast-worker message type: ${data.type}`);
@@ -201,33 +208,6 @@ class BroadcastHelper {
     /**
      * Creates a transaction with indexedDB to store the message within the History table.
      */
-    private async makeHistory(message: BroadcastWorkerMessage) {
-        if (!this.db) {
-            return;
-        }
-        new Promise((resolve, reject) => {
-            const transaction = this.db.transaction("history", "readwrite");
-            const store = transaction.objectStore("history");
-            const transactionData = {
-                senderId: message?.senderId,
-                messageUid: message?.messageId,
-                recipient: message?.recipient?.trim().toLowerCase(),
-                data: message?.data,
-                attempt: message?.attempts,
-            };
-            store.add(transactionData);
-            transaction.oncomplete = resolve;
-            transaction.onerror = reject;
-        })
-            .then(() => {})
-            .catch(error => {
-                console.error(`Failed to write to the History table:`, error);
-            });
-    }
-
-    /**
-     * Creates a transaction with indexedDB to store the message within the History table.
-     */
     private async logReply(replyId: string, recipient: string = null, senderId: string = null) {
         if (this.db) {
             new Promise((resolve, reject) => {
@@ -237,6 +217,7 @@ class BroadcastHelper {
                     replyId: replyId,
                     recipient: recipient,
                     senderId: senderId,
+                    createdAt: Date.now(),
                 };
                 store.add(transactionData);
                 transaction.oncomplete = resolve;
@@ -263,7 +244,6 @@ class BroadcastHelper {
      * @param message - the `BroadcastWorkerMessage` object
      */
     private async lookup(message: BroadcastWorkerMessage) {
-        this.makeHistory(message);
         const inboxAddressIndexes: Array<number> = [];
         let recipient = null;
 

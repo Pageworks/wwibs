@@ -6,3 +6,5 @@ wwibs.js
 wwibs.d.ts
 wwibs-worker.min.js
 types.d.ts
+wwibs.min.js
+wwibs.min.mjs
