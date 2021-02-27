@@ -26,7 +26,7 @@ Or use the CDN version:
 import { hookup, disconnect, message, reply, replyAll } from "https://cdn.jsdelivr.net/npm/wwibs@0.2.0/wwibs.min.mjs";
 ```
 
-**Note:** If you don't use the `type="module"` version of this library you will need to use the global functions instead:
+**Note:** If you don't use the `<script>` version of this library you will need to use the global functions instead:
 
 ```javascript
 globalHookup();
