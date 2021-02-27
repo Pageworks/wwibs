@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2021-02-27
+
+### Changed
+
+- reply table is no longer deleted on `beforeunload` event
+- replies older than 1 day will be removed from IDB
+
+### Fixed
+
+- bug where indexedDB databases wouldn't get deleted on the window's `beforeunload` event
+
+### Removed
+
+- IDB history table
+
 ## [0.1.2] - 2020-04-28
 
 ### Fixed

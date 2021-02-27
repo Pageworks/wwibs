@@ -25,16 +25,6 @@ export default class Broadcaster {
         this.state = {
             allowMessaging: false,
         };
-
-        window.addEventListener("unload", () => {
-            const workerMessage = {
-                recipient: "broadcast-worker",
-                data: {
-                    type: "unload",
-                },
-            };
-            this.worker.postMessage(workerMessage);
-        });
     }
 
     private async setupBroadcastWorker() {
