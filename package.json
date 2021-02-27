@@ -11,7 +11,9 @@
         "wwibs.js",
         "wwibs.d.ts",
         "wwibs-worker.min.js",
-        "types.d.ts"
+        "types.d.ts",
+        "wwibs.min.js",
+        "wwibs.min.mjs"
     ],
     "repository": {
         "type": "git",
@@ -33,6 +35,7 @@
         "@codewithkyle/dev-docs": "^0.1.14",
         "@typescript-eslint/eslint-plugin": "^2.34.0",
         "@typescript-eslint/parser": "^2.34.0",
+        "esbuild": "^0.8.53",
         "eslint": "^6.8.0",
         "eslint-config-prettier": "^6.15.0",
         "eslint-plugin-prettier": "^3.3.1",
@@ -45,12 +48,13 @@
         "prettier": "prettier --write \"src/**/*.ts\"",
         "eslint": "eslint -c .eslintrc.js src/**/*.ts",
         "lint": "npm run prettier && npm run eslint",
-        "cleanup": "node ./build-tools/cleanup.js",
+        "cleanup": "node ./build/cleanup.js",
         "compile": "npm run cleanup && tsc",
-        "prerelease": "npm run lint && npm run compile && node ./build-tools/prerelease.js",
+        "prerelease": "npm run lint && npm run compile && node ./build/prerelease.js && npm run bundle",
         "docs": "docs",
         "predeploy": "docs -o ./public -c ./CNAME",
-        "deploy": "node ./build-tools/deploy.js"
+        "deploy": "node ./build/deploy.js",
+        "bundle": "esbuild ./wwibs.js --bundle --outfile=wwibs.min.js --format=iife --minify && esbuild ./wwibs.js --bundle --outfile=wwibs.min.mjs --format=esm --minify"
     },
     "devDocs": {
         "name": "WWIBS",
